@@ -26,18 +26,15 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("El email ya esta registrado");
         }
-        RoleName rol;
 
-        try {
-            rol = request.getRol();
-        } catch (Exception e) {
-            rol = RoleName.ROLE_USER;
+        if (request.getRol() == null) {
+            throw new IllegalArgumentException("El rol es obligatorio");
         }
         User user = User.builder()
             .username(request.getUsername())
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
-            .role(rol)
+            .role(request.getRol())
             .build();
         userRepository.save(user);
         String token = jwtService.generateToken(user);
